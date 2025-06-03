@@ -28,7 +28,7 @@ class ArtImage(models.Model):
     image = models.ImageField(upload_to='art_images/')
     
     def __str__(self):
-        return f"Image for {self.atr.title}"
+        return f"Image for {self.art.title}"
     
 
 

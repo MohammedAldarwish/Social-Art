@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Course, Lesson, Enrollment, Payment, CourseImages, CourseRating
+from .models import Course, Lesson, Enrollment, Payment, CourseImages, CourseRating, InstructorDashboard
 
 
 class ImageCourseSerializer(serializers.ModelSerializer):
@@ -78,3 +78,10 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = ['order_id', 'enrollment', 'amount', 'is_paid', 'payment_id']
         read_only_fields = ['order_id', 'is_paid']
         
+
+
+class InstructorDashboardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InstructorDashboard
+        fields = ['user', 'course', 'errollment', 'created_at']
+        read_only_fields = ['created_at']

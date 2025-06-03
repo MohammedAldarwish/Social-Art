@@ -65,3 +65,10 @@ class MyProfileSerializer(serializers.ModelSerializer):
 
     def get_following_count(self, obj):
         return obj.user.following.count()
+    
+    
+# this class to make the search class
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username']

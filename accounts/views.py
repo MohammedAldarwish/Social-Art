@@ -1,13 +1,17 @@
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import RegisterSerializer, MyTokenObtainPairSerializer, MyProfileSerializer
+from .serializer import RegisterSerializer, MyTokenObtainPairSerializer, MyProfileSerializer, UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.shortcuts import get_object_or_404
 from .models import CustomUser, Follower, MyProfileModel
 from rest_framework.generics import RetrieveAPIView
+from rest_framework import generics
+#from .filters import UserFilter
+from rest_framework import filters
+
 
 class RegisterView(APIView):
     def post(self, request):
@@ -105,3 +109,9 @@ class OtherProfileView(RetrieveAPIView):
         username = self.kwargs['username']
         return get_object_or_404(MyProfileModel, user__username=username)
     
+    
+class UserSearchView(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username']

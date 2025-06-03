@@ -1,6 +1,6 @@
 from rest_framework import viewsets , permissions
-from .serializer import CourseSerializer, LessonSerializer, EnrollmentSerializer, PaymentSerializer, CourseAdminSerializer, CourseRatingSerializer
-from .models import Course, CourseRating, Enrollment, Payment, Lesson
+from .serializer import CourseSerializer, LessonSerializer, EnrollmentSerializer, PaymentSerializer, CourseAdminSerializer, CourseRatingSerializer, InstructorDashboardSerializer
+from .models import Course, CourseRating, Enrollment, Payment, Lesson, InstructorDashboard
 from .permission__ import IsInstructorOwner
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -20,16 +20,24 @@ from rest_framework.exceptions import PermissionDenied
 
 from django.shortcuts import get_object_or_404
 
+from django.db.models import Sum
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class CourseView(viewsets.ModelViewSet):
     queryset = Course.objects.filter(is_approved=True)
     serializer_class = CourseSerializer
-    permission_classes = [permissions.IsAuthenticated, IsInstructorOwner]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(instructor=self.request.user)
-               
+    
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update', 'destroy']:
+            self.permission_classes = [permissions.IsAuthenticated, IsInstructorOwner]
+        else:
+            self.permission_classes = [IsAuthenticatedOrReadOnly]
+        return super().get_permissions()           
 
 class CourseAdminView(viewsets.ModelViewSet):
     queryset = Course.objects.filter(is_approved=False)
@@ -162,3 +170,12 @@ class LessonView(viewsets.ModelViewSet):
         if not course.is_approved:
             raise PermissionDenied("Cannot add lessons to an unapproved course.")
         serializer.save()
+
+class InstructorDashboardView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request): 
+        dashboards = InstructorDashboard.objects.filter(user=request.user)
+        serializer = InstructorDashboardSerializer(dashboards, many=True)
+        
+        return Response(serializer.data)

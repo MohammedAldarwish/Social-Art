@@ -88,3 +88,14 @@ class Payment(models.Model):
     def __str__(self):
         return f"{self.enrollment.student} bought a course {self.enrollment.course} price {self.amount}"
     
+    
+class InstructorDashboard(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE) 
+    errollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Dashboard for {self.user} - {self.course.title}"
+    

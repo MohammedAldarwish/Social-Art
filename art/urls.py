@@ -7,5 +7,7 @@ router.register('art', ArtView, basename='art')
 router.register('comment', CommentViewSet, basename='comment')
 router.register('like', LikeViewSet, basename='like')
 
+
+
 urlpatterns = router.urls
 
